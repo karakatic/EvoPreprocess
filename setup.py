@@ -26,7 +26,7 @@ setuptools.setup(
     version=read_package_variable('__version__'),
     author='Sašo Karakatič',
     author_email='karakatic@gmail.com',
-    description='EvoPreprocess: Data Preprocessing Python Toolkit with Evolutionary and Nature Inspired Algorithms.',
+    description='Data Preprocessing with Evolutionary and Nature Inspired Algorithms.',
     license='MIT',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -58,7 +58,7 @@ setuptools.setup(
     keywords=[
         'Evolutionary Algorithms',
         'Nature Inspired Algorithms',
-        'Data sampling',
+        'Data Sampling',
         'Instance Weighting',
         'Feature Selection',
         'Preprocessing',

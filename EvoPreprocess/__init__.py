@@ -18,5 +18,5 @@ from . import data_weighting
 
 name = 'EvoPreprocess'
 __project__ = 'EvoPreprocess'
-__version__ = '0.1.1'
+__version__ = '0.1.4'
 __all__ = ['feature_selection', 'data_sampling', 'data_weighting']

@@ -24,7 +24,7 @@ Install EvoPreprocess with pip:
 ```sh
 $ pip install EvoPreprocess
 ```
-or directly from the source code:
+Or directly from the source code:
 
 ```sh
 $ git clone https://github.com/karakatic/EvoPreprocess.git
@@ -34,7 +34,7 @@ $ python setup.py install
 
 # Usage
 
-After installation, the package can imported:
+After installation, the package can be imported:
 
 ```sh
 $ python
