@@ -109,26 +109,6 @@ class EvoWeighting(object):
         mask = []
         evos = []  # Parameters for parallel threaded evolution run
 
-        i = 0
-        for train_index, val_index in skf.split(X, y):
-            opt_settings = es.get_args(self.optimizer)
-            opt_settings.update(self.optimizer_settings)
-            benchm = self.benchmark(X=X, y=y,
-                                    train_indices=train_index, valid_indices=val_index,
-                                    random_seed=self.random_state)
-            task = StoppingTask(D=len(train_index),
-                                nFES=opt_settings.pop('nFES', 1000),
-                                optType=OptimizationType.MINIMIZATION,
-                                benchmark=benchm)
-
-            optimization = self.optimizer(seed=self.random_seed, **opt_settings)
-            best = optimization.run(task)
-            weights[train_index, i] = best[0]
-            i = i + 1
-
-        weights = np.ma.masked_array(weights, np.isnan(weights))
-        weights = np.mean(weights, axis=1)
-
         for train_index, val_index in skf.split(X, y):
             mask.append(train_index)
             for j in range(self.n_runs):
@@ -140,8 +120,6 @@ class EvoWeighting(object):
             results = pool.starmap(EvoWeighting._run, evos)
         weights = EvoWeighting._reduce(mask, results, self.n_runs, self.n_folds, len(y))
         return weights
-
-        # return weights
 
     @staticmethod
     def _run(X, y, train_index, val_index, random_seed, optimizer, evaluator, benchmark, optimizer_settings):
