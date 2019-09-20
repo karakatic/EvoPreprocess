@@ -7,15 +7,17 @@ from NiaPy to actual dataset.
 # License: MIT
 
 import math
-from sklearn.base import ClassifierMixin
-from sklearn.naive_bayes import GaussianNB
-from sklearn.utils import safe_indexing
-from sklearn.metrics import accuracy_score, mean_squared_error
-import numpy as np
 import random
 
+import numpy as np
+from NiaPy.benchmarks import Benchmark
+from sklearn.base import ClassifierMixin
+from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.naive_bayes import GaussianNB
+from sklearn.utils import safe_indexing
 
-class SamplingBenchmark(object):
+
+class SamplingBenchmark(Benchmark):
     """
     Helper benchmark class for sampling data.
 
@@ -34,7 +36,7 @@ class SamplingBenchmark(object):
         Corresponding indices for validation instances from X.
 
     random_seed : int or None, optional (default=1234)
-        It used as seed by the random number generator.
+        It used as seed for the random number generator.
 
     evaluator : classifier or regressor, optional (default=None)
         The classification or regression object from scikit-learn framework.
@@ -51,6 +53,7 @@ class SamplingBenchmark(object):
                  evaluator=None):
         self.Lower = 0
         self.Upper = 1
+        super().__init__(self.Lower, self.Upper)
 
         self.X_train, self.X_valid = X[train_indices], X[valid_indices]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
@@ -68,7 +71,7 @@ class SamplingBenchmark(object):
             X_sampled = safe_indexing(self.X_train, phenotype)
             y_sampled = safe_indexing(self.y_train, phenotype)
 
-            if X_sampled.shape[0] > 0:  # Check if no features were selected
+            if X_sampled.shape[0] > 0:  # Check if no instances were selected
                 cls = self.evaluator.fit(X_sampled, y_sampled)
                 y_predicted = cls.predict(self.X_valid)
                 acc = self.metric(self.y_valid, y_predicted)

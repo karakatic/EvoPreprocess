@@ -6,16 +6,19 @@ Class to perform instance weighting with evolutionary and nature inspired algori
 # License: MIT
 
 import logging
+import sys
 import time
+from multiprocessing.pool import Pool
 
 import numpy as np
 from NiaPy.algorithms.basic.ga import GeneticAlgorithm
+from NiaPy.task import OptimizationType, StoppingTask
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_random_state
 
-from EvoPreprocess.data_sampling import EvoSampling
+import EvoPreprocess.utils.EvoSettings as es
 from EvoPreprocess.data_weighting.WeightingBenchmark import WeightingBenchmark
 
 logging.basicConfig()
@@ -25,7 +28,7 @@ logger.setLevel('INFO')
 
 class EvoWeighting(object):
     """
-    Wight instances from the dataset with evolutionary and nature-inspired methods.
+    Weight instances from the dataset with evolutionary and nature-inspired methods.
 
     Parameters
     ----------
@@ -52,6 +55,9 @@ class EvoWeighting(object):
     n_jobs : int, optional (default=None)
         The number of jobs to run in parallel.
         If None, then the number of jobs is set to the number of cores.
+
+    optimizer_settings : dict, optional (default={})
+        Custom settings for the optimizer.
     """
 
     def __init__(self,
@@ -61,7 +67,8 @@ class EvoWeighting(object):
                  n_runs=10,
                  n_folds=3,
                  benchmark=WeightingBenchmark,
-                 n_jobs=None):
+                 n_jobs=None,
+                 optimizer_settings={}):
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.random_seed = int(time.time()) if random_seed is None else random_seed
@@ -71,6 +78,7 @@ class EvoWeighting(object):
         self.n_folds = n_folds
         self.n_jobs = n_jobs
         self.benchmark = benchmark
+        self.optimizer_settings = optimizer_settings
 
     def reweight(self, X, y):
         """Reweight the dataset.
@@ -98,17 +106,75 @@ class EvoWeighting(object):
         else:
             skf = KFold(n_splits=self.n_folds, shuffle=True, random_state=self.random_state)
 
+        mask = []
+        evos = []  # Parameters for parallel threaded evolution run
+
         i = 0
         for train_index, val_index in skf.split(X, y):
-            benchmark = self.benchmark(X=X, y=y,
-                                       train_indices=train_index, valid_indices=val_index,
-                                       random_seed=self.random_state)
-            optimization = self.optimizer(**EvoSampling._get_args(self.optimizer, benchmark))
+            opt_settings = es.get_args(self.optimizer)
+            opt_settings.update(self.optimizer_settings)
+            benchm = self.benchmark(X=X, y=y,
+                                    train_indices=train_index, valid_indices=val_index,
+                                    random_seed=self.random_state)
+            task = StoppingTask(D=len(train_index),
+                                nFES=opt_settings.pop('nFES', 1000),
+                                optType=OptimizationType.MINIMIZATION,
+                                benchmark=benchm)
 
-            best = optimization.run()
+            optimization = self.optimizer(seed=self.random_seed, **opt_settings)
+            best = optimization.run(task)
             weights[train_index, i] = best[0]
             i = i + 1
 
         weights = np.ma.masked_array(weights, np.isnan(weights))
         weights = np.mean(weights, axis=1)
+
+        for train_index, val_index in skf.split(X, y):
+            mask.append(train_index)
+            for j in range(self.n_runs):
+                evos.append(
+                    (X, y, train_index, val_index, self.random_seed + j + 1, self.optimizer, self.evaluator,
+                     self.benchmark, self.optimizer_settings))
+
+        with Pool(processes=self.n_jobs) as pool:
+            results = pool.starmap(EvoWeighting._run, evos)
+        weights = EvoWeighting._reduce(mask, results, self.n_runs, self.n_folds, len(y))
+        return weights
+
+        # return weights
+
+    @staticmethod
+    def _run(X, y, train_index, val_index, random_seed, optimizer, evaluator, benchmark, optimizer_settings):
+        opt_settings = es.get_args(optimizer)
+        opt_settings.update(optimizer_settings)
+        benchm = benchmark(X=X, y=y,
+                           train_indices=train_index, valid_indices=val_index,
+                           random_seed=random_seed,
+                           evaluator=evaluator)
+        task = StoppingTask(D=len(train_index),
+                            nFES=opt_settings.pop('nFES', 1000),
+                            optType=OptimizationType.MINIMIZATION,
+                            benchmark=benchm)
+
+        evo = optimizer(seed=random_seed, **opt_settings)
+        return evo.run(task=task)
+
+    @staticmethod
+    def _reduce(mask, results, runs, cv, len_y=10):
+        weights = np.full((len_y, cv), np.nan)  # Columns are number of occurrences in one run
+
+        result_list = [results[x:x + runs] for x in range(0, cv * runs, runs)]
+        i = 0
+        for cv_one in result_list:
+            best_fitness = sys.float_info.max
+            best_solution = None
+            for result_one in cv_one:
+                if (best_solution is None) or (best_fitness > result_one[1]):
+                    best_solution, best_fitness = result_one[0], result_one[1]
+
+            weights[mask[i], i] = best_solution
+            i = i + 1
+
+        weights = np.nanmean(weights, axis=1)
+
         return weights

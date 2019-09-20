@@ -6,16 +6,18 @@ algorithms from NiaPy to actual dataset.
 # Authors: Sašo Karakatič <karakatic@gmail.com>
 # License: MIT
 
-import random
 import math
+import random
+
 import numpy as np
+from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import mean_squared_error
 from sklearn.naive_bayes import GaussianNB
 
 
-class FeatureSelectionBenchmark(object):
+class FeatureSelectionBenchmark(Benchmark):
     """
     Helper benchmark class for feature selection.
 
@@ -25,7 +27,7 @@ class FeatureSelectionBenchmark(object):
         Matrix containing the data which have to have features selected.
 
     y : array-like, shape (n_samples)
-        Corresponding label for each instance in X.
+        Corresponding target values for each instance in X.
 
     train_indices : array-like, shape (n_samples)
         Corresponding indices for training instances from X.
@@ -46,10 +48,10 @@ class FeatureSelectionBenchmark(object):
 
     def __init__(self,
                  X, y,
-                 train_indices=None,
-                 valid_indices=None,
+                 train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
+        super().__init__(self.Lower, self.Upper)
         self.Lower = 0
         self.Upper = 1
 
@@ -73,7 +75,7 @@ class FeatureSelectionBenchmark(object):
                 cls = self.evaluator.fit(X_train_new, self.y_train)
                 y_predicted = cls.predict(X_valid_new)
                 acc = self.metric(self.y_valid, y_predicted)
-                used_percentage = X_train_new.shape[1] / len(sol)
+                # used_percentage = X_train_new.shape[1] / len(sol)
 
                 # Check if classifier or regressor
                 acc = (1 - acc) if self.evaluator is ClassifierMixin else acc

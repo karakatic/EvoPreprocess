@@ -10,8 +10,10 @@ import logging
 import sys
 import time
 from multiprocessing import Pool
+
 import numpy as np
 from NiaPy.algorithms.basic.ga import GeneticAlgorithm
+from NiaPy.task import StoppingTask, OptimizationType
 from scipy import stats
 from sklearn.base import ClassifierMixin
 from sklearn.feature_selection.univariate_selection import _BaseFilter
@@ -20,7 +22,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-import EvoPreprocess.data_sampling.settings.EvoSettings as es
+import EvoPreprocess.utils.EvoSettings as es
 from EvoPreprocess.feature_selection.FeatureSelectionBenchmark import FeatureSelectionBenchmark
 
 logging.basicConfig()
@@ -57,7 +59,11 @@ class EvoFeatureSelection(_BaseFilter):
     n_jobs : int, optional (default=None)
         The number of jobs to run in parallel.
         If None, then the number of jobs is set to the number of cores.
+
+    optimizer_settings : dict, optional (default={})
+        Custom settings for the optimizer.
     """
+
     def __init__(self,
                  random_seed=None,
                  evaluator=None,
@@ -65,7 +71,8 @@ class EvoFeatureSelection(_BaseFilter):
                  n_runs=3,
                  n_folds=3,
                  benchmark=FeatureSelectionBenchmark,
-                 n_jobs=None):
+                 n_jobs=None,
+                 optimizer_settings={}):
         super(EvoFeatureSelection, self).__init__(self.select)
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
@@ -76,6 +83,7 @@ class EvoFeatureSelection(_BaseFilter):
         self.n_folds = n_folds
         self.n_jobs = n_jobs
         self.benchmark = benchmark
+        self.optimizer_settings = optimizer_settings
 
     def _get_support_mask(self):
         check_is_fitted(self, 'scores_')
@@ -83,7 +91,7 @@ class EvoFeatureSelection(_BaseFilter):
         return self.scores_ > 0
 
     def select(self, X, y):
-        """Select features from the dataset.
+        """Selects features from the dataset.
 
         Parameters
         ----------
@@ -110,7 +118,7 @@ class EvoFeatureSelection(_BaseFilter):
             for j in range(self.n_runs):
                 evos.append(
                     (X, y, train_index, val_index, self.random_seed + j + 1, self.optimizer, self.evaluator,
-                     self.benchmark))
+                     self.benchmark, self.optimizer_settings))
 
         with Pool(processes=self.n_jobs) as pool:
             results = pool.starmap(EvoFeatureSelection._run, evos)
@@ -118,12 +126,20 @@ class EvoFeatureSelection(_BaseFilter):
         return EvoFeatureSelection._reduce(results, self.n_runs, self.n_folds, self.benchmark, X.shape[1])
 
     @staticmethod
-    def _run(X, y, train_index, val_index, random_seed, optimizer, eval_alg, benchmark):
-        benchm = benchmark(X=X, y=y, evaluator=eval_alg,
+    def _run(X, y, train_index, val_index, random_seed, optimizer, evaluator, benchmark, optimizer_settings):
+        opt_settings = es.get_args(optimizer)
+        opt_settings.update(optimizer_settings)
+        benchm = benchmark(X=X, y=y,
                            train_indices=train_index, valid_indices=val_index,
-                           random_seed=random_seed)
-        evo = optimizer(seed=random_seed, **EvoFeatureSelection._get_args(optimizer, benchm))
-        return evo.run()
+                           random_seed=random_seed,
+                           evaluator=evaluator)
+        task = StoppingTask(D=benchm.X_train.shape[1],
+                            nFES=opt_settings.pop('nFES', 1000),
+                            optType=OptimizationType.MINIMIZATION,
+                            benchmark=benchm)
+
+        evo = optimizer(seed=random_seed, **opt_settings)
+        return evo.run(task=task)
 
     @staticmethod
     def _reduce(results, runs, cv, benchmark, len_y=10):
@@ -144,10 +160,3 @@ class EvoFeatureSelection(_BaseFilter):
         features = stats.mode(features, axis=1, nan_policy='omit')[0].flatten()
 
         return features
-
-    @staticmethod
-    def _get_args(algorithm, benchmark):
-        kwargs = {**es.all_kwargs,
-                  **es.kwargs[algorithm],
-                  **{'D': benchmark.X_train.shape[1], 'benchmark': benchmark}}
-        return kwargs

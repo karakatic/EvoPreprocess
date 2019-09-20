@@ -4,6 +4,5 @@ algorithms.
 """
 
 from .EvoSampling import EvoSampling
-from .settings import EvoSettings
 
-__all__ = ['EvoSampling', 'EvoSettings']
+__all__ = ['EvoSampling']

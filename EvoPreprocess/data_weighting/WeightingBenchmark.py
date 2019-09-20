@@ -7,12 +7,13 @@ import random
 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
 # License: MIT
+from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.naive_bayes import GaussianNB
 
 
-class WeightingBenchmark(object):
+class WeightingBenchmark(Benchmark):
     """
     Helper benchmark class for weighting instances.
 
@@ -39,12 +40,12 @@ class WeightingBenchmark(object):
     """
     def __init__(self,
                  X, y,
-                 upper=2,
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
         self.Lower = 0
-        self.Upper = upper  # TODO: Max weight of the instance, should be tested
+        self.Upper = 2  # Max weight of the instance, should be tested
+        super().__init__(self.Lower, self.Upper)
 
         self.X_train, self.X_valid = X[train_indices], X[valid_indices]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
