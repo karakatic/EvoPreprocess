@@ -60,6 +60,7 @@ class EvoSampling(BaseSampler):
         The number of jobs to run in parallel.
         If None, then the number of jobs is set to the number of cores.
     """
+
     def __init__(self,
                  random_seed=None,
                  evaluator=None,
@@ -73,6 +74,7 @@ class EvoSampling(BaseSampler):
 
         if optimizer_settings is None:
             optimizer_settings = {}
+
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.random_seed = int(time.time()) if random_seed is None else random_seed
         self.random_state = check_random_state(self.random_seed)

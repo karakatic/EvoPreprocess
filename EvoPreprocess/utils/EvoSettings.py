@@ -46,5 +46,5 @@ def get_args(optimizer):
     args : Dictionary of default settings for the provided optimization method.
     """
     args = {**all_kwargs,
-            **kwargs[optimizer]}
+            **kwargs.get(optimizer, {})}
     return args

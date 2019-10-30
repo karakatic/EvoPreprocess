@@ -51,9 +51,9 @@ class FeatureSelectionBenchmark(Benchmark):
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
-        super().__init__(self.Lower, self.Upper)
         self.Lower = 0
         self.Upper = 1
+        super().__init__(self.Lower, self.Upper)
 
         self.X_train, self.X_valid = X[train_indices], X[valid_indices]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
