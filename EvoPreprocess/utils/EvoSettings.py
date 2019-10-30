@@ -3,7 +3,7 @@ Helper class for default setting of some evolutionary and nature inspired NiaPy 
 """
 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
-# License: MIT
+# License: GNU General Public License v3.0
 
 
 import NiaPy.algorithms.basic as nia

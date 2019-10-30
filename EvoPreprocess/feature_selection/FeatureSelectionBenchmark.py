@@ -4,7 +4,7 @@ algorithms from NiaPy to actual dataset.
 """
 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
-# License: MIT
+# License: GNU General Public License v3.0
 
 import math
 import random

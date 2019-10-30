@@ -1,6 +1,6 @@
 # EvoPreprocess
 
-EvoPreprocess is a Python toolkit for sampling datasets, instance weighting, and feature selection. It is compatible with [scikit-learn](http://scikit-learn.org/stable/) and [imbalanced-learn](https://imbalanced-learn.readthedocs.io/en/stable/). It is based on [NiaPy](https://github.com/NiaOrg/NiaPy) library for the implementation of nature-inspired algorithms and is distributed under MIT license.
+EvoPreprocess is a Python toolkit for sampling datasets, instance weighting, and feature selection. It is compatible with [scikit-learn](http://scikit-learn.org/stable/) and [imbalanced-learn](https://imbalanced-learn.readthedocs.io/en/stable/). It is based on [NiaPy](https://github.com/NiaOrg/NiaPy) library for the implementation of nature-inspired algorithms and is distributed under GNU General Public License v3.0 license.
 
 ## Getting Started
 
@@ -326,4 +326,4 @@ EvoPreprocess was programmed and is maintained by Sašo Karakatič from Universi
 
 ## License
 
-This project is licensed under the MIT License - see <http://www.opensource.org/licenses/MIT>.
+This project is licensed under the GNU General Public License v3.0 License - see <http://www.opensource.org/licenses/GNU General Public License v3.0>.

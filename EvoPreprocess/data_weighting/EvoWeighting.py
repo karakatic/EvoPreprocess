@@ -3,7 +3,7 @@ Class to perform instance weighting with evolutionary and nature inspired algori
 """
 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
-# License: MIT
+# License: GNU General Public License v3.0
 
 import logging
 import sys

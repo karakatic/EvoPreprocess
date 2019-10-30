@@ -6,7 +6,7 @@ inspired algorithms from NiaPy to actual weights.
 import random
 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
-# License: MIT
+# License: GNU General Public License v3.0
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
