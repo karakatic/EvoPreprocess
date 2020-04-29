@@ -9,7 +9,7 @@ from EvoPreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Set the random seed for the reproducibility
-    random_seed = 1234
+    random_seed = 987
 
     # Load classification data
     dataset = load_boston()
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     pipeline = Pipeline(steps=[
         ('feature_selection', EvoFeatureSelection(
             evaluator=LinearRegression(),
-            n_folds=3,
-            n_runs=3,
+            n_folds=4,
+            n_runs=8,
             random_seed=random_seed)),
         ('regressor', DecisionTreeRegressor(random_state=random_seed))])
 

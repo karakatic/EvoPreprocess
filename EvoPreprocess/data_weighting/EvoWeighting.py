@@ -65,7 +65,7 @@ class EvoWeighting(object):
                  evaluator=None,
                  optimizer=GeneticAlgorithm,
                  n_runs=10,
-                 n_folds=3,
+                 n_folds=2,
                  benchmark=WeightingBenchmark,
                  n_jobs=None,
                  optimizer_settings={}):
@@ -129,13 +129,17 @@ class EvoWeighting(object):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=len(train_index),
+        task = StoppingTask(D=len(train_index) + 1,
                             nFES=opt_settings.pop('nFES', 1000),
                             optType=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
         evo = optimizer(seed=random_seed, **opt_settings)
-        return evo.run(task=task)
+        r = evo.run(task=task)
+        if isinstance(r[0], np.ndarray):
+            return benchmark.to_phenotype(r[0], benchm.Upper), r[1]
+        else:
+            return benchmark.to_phenotype(r[0].x, benchm.Upper), r[1]
 
     @staticmethod
     def _reduce(mask, results, runs, cv, len_y=10):

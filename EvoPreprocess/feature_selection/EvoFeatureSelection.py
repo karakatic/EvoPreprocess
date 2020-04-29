@@ -68,8 +68,8 @@ class EvoFeatureSelection(_BaseFilter):
                  random_seed=None,
                  evaluator=None,
                  optimizer=GeneticAlgorithm,
-                 n_runs=3,
-                 n_folds=3,
+                 n_runs=10,
+                 n_folds=2,
                  benchmark=FeatureSelectionBenchmark,
                  n_jobs=None,
                  optimizer_settings={}):
@@ -133,13 +133,17 @@ class EvoFeatureSelection(_BaseFilter):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=benchm.X_train.shape[1],
+        task = StoppingTask(D=X.shape[1] + 1,
                             nFES=opt_settings.pop('nFES', 1000),
                             optType=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
         evo = optimizer(seed=random_seed, **opt_settings)
-        return evo.run(task=task)
+        r = evo.run(task=task)
+        if isinstance(r[0], np.ndarray):
+            return benchmark.to_phenotype(r[0], benchm.split), r[1]
+        else:
+            return benchmark.to_phenotype(r[0].x, benchm.split), r[1]
 
     @staticmethod
     def _reduce(results, runs, cv, benchmark, len_y=10):
@@ -154,7 +158,7 @@ class EvoFeatureSelection(_BaseFilter):
                 if (best_solution is None) or (best_fitness > result_one[1]):
                     best_solution, best_fitness = result_one[0], result_one[1]
 
-            features[:, i] = benchmark.genotype_to_map(best_solution)
+            features[:, i] = best_solution.astype(int)
             i = i + 1
 
         features = stats.mode(features, axis=1, nan_policy='omit')[0].flatten()

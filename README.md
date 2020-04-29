@@ -14,9 +14,10 @@ These instructions will get you a copy of the project up and running on your loc
 EvoSampling requires:
 
 - numpy(>=1.8.2)
+- scipy(>=0.17)
 - scikit-learn(>=0.19.0)
 - imbalanced-learn(>=0.3.1)
-- NiaPy(>=2.0.0rc2)
+- NiaPy(>=2.0.0rc5)
 
 ### Installation
 Install EvoPreprocess with pip:
@@ -321,7 +322,7 @@ For more examples please look at **Examples** folder.
 
 # Authors
 
-EvoPreprocess was programmed and is maintained by Sašo Karakatič from University of Maribor.
+EvoPreprocess was programmed and is maintained by Saso Karakatic from University of Maribor.
 
 
 ## License

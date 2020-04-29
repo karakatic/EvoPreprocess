@@ -3,10 +3,12 @@ Helper class which evaluates the weights of instances and transforms the genotyp
 inspired algorithms from NiaPy to actual weights.
 """
 
-import random
-
 # Authors: Sašo Karakatič <karakatic@gmail.com>
 # License: GNU General Public License v3.0
+
+import random
+
+import pandas as pd
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -38,31 +40,44 @@ class WeightingBenchmark(Benchmark):
         The classification or regression object from scikit-learn framework.
         If None, the GausianNB for classification is used.
     """
+
     def __init__(self,
                  X, y,
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
         self.Lower = 0
-        self.Upper = 2  # Max weight of the instance, should be tested
+        self.Upper = 10  # Max weight of the instance, should be tested
         super().__init__(self.Lower, self.Upper)
 
-        self.X_train, self.X_valid = X[train_indices], X[valid_indices]
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+        if isinstance(y, pd.Series):
+            y = y.values
+
+        self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.evaluator.random_state = random_seed
-        self.metric = accuracy_score if self.evaluator is ClassifierMixin else mean_squared_error
+        self.metric = accuracy_score if issubclass(type(self.evaluator), ClassifierMixin) else mean_squared_error
 
         self.random_seed = random_seed
         random.seed(random_seed)
 
     def function(self):
         def evaluate(D, sol):
-            cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=sol)
+            weights = WeightingBenchmark.to_phenotype(sol, self.Upper)
+            cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=weights)
             y_predicted = cls.predict(self.X_valid)
             acc = self.metric(self.y_valid, y_predicted)
-            acc = (1 - acc) if self.evaluator is ClassifierMixin else acc
+            acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
             return acc
 
         return evaluate
+
+    @staticmethod
+    def to_phenotype(sol, Upper):
+        max_value = sol[-1] / Upper
+        weights = sol[:-1]
+        return weights * max_value

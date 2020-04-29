@@ -49,11 +49,11 @@ setuptools.setup(
         'Topic :: Scientific/Engineering :: Information Analysis'
     ],
     install_requires=[
-        'numpy',
-        'scipy',
+        'numpy>=1.8.2',
+        'scipy>=0.17',
         'scikit-learn>=0.19.0'
         'imbalanced-learn>=0.3.1'
-        'NiaPy>=2.0.0rc2'
+        'NiaPy>=2.0.0rc5'
     ],
     keywords=[
         'Evolutionary Algorithms',

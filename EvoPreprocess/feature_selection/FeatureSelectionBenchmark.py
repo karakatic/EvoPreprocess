@@ -10,9 +10,10 @@ import math
 import random
 
 import numpy as np
+import pandas as pd
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
 from sklearn.metrics import mean_squared_error
 from sklearn.naive_bayes import GaussianNB
 
@@ -50,24 +51,31 @@ class FeatureSelectionBenchmark(Benchmark):
                  X, y,
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
-                 evaluator=None):
+                 evaluator=None,
+                 split=None):
         self.Lower = 0
         self.Upper = 1
         super().__init__(self.Lower, self.Upper)
 
-        self.X_train, self.X_valid = X[train_indices], X[valid_indices]
+        self.split = split
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+        if isinstance(y, pd.Series):
+            y = y.values
+
+        self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.evaluator.random_state = random_seed
-        self.metric = accuracy_score if self.evaluator is ClassifierMixin else mean_squared_error
+        self.metric = f1_score if issubclass(type(self.evaluator), ClassifierMixin) else mean_squared_error
 
         self.random_seed = random_seed
         random.seed(random_seed)
 
     def function(self):
         def evaluate(D, sol):
-            phenotype = FeatureSelectionBenchmark.to_phenotype(sol)
+            phenotype = FeatureSelectionBenchmark.to_phenotype(sol, self.split)
             X_train_new = self.X_train[:, phenotype]
             X_valid_new = self.X_valid[:, phenotype]
 
@@ -78,7 +86,7 @@ class FeatureSelectionBenchmark(Benchmark):
                 # used_percentage = X_train_new.shape[1] / len(sol)
 
                 # Check if classifier or regressor
-                acc = (1 - acc) if self.evaluator is ClassifierMixin else acc
+                acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
                 return acc
             else:
                 return math.inf
@@ -86,8 +94,14 @@ class FeatureSelectionBenchmark(Benchmark):
         return evaluate
 
     @staticmethod
-    def to_phenotype(genotype):
-        return FeatureSelectionBenchmark.map_to_phenotype(FeatureSelectionBenchmark.genotype_to_map(genotype))
+    def to_phenotype(genotype, split=None):
+        if split is None:
+            s = genotype[-1] if split is None else split
+            features = genotype[:-1]
+        else:
+            s = split
+            features = genotype
+        return features >= s
 
     @staticmethod
     def genotype_to_map(genotype):

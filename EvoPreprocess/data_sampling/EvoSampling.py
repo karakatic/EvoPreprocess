@@ -8,13 +8,16 @@ Class to perform sampling with evolutionary and nature inspired algorithms.
 import logging
 import sys
 import time
+from collections import Counter
 from multiprocessing import Pool
 
 import numpy as np
+from NiaPy.algorithms import Individual
 from NiaPy.algorithms.basic.ga import GeneticAlgorithm
 from NiaPy.task import StoppingTask, OptimizationType
+from NiaPy.util import objects2array
 from imblearn.base import BaseSampler
-from scipy import stats
+from scipy.stats import stats
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
@@ -66,7 +69,7 @@ class EvoSampling(BaseSampler):
                  evaluator=None,
                  optimizer=GeneticAlgorithm,
                  n_runs=10,
-                 n_folds=3,
+                 n_folds=2,
                  benchmark=SamplingBenchmark,
                  n_jobs=None,
                  optimizer_settings={}):
@@ -138,13 +141,20 @@ class EvoSampling(BaseSampler):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=len(train_index),
+        task = StoppingTask(D=len(train_index) + 5,
                             nFES=opt_settings.pop('nFES', 1000),
                             optType=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
+        # if evaluator is ClassifierMixin:
+        #     evo = optimizer(seed=random_seed, InitPopFunc=EvoSampling.heuristicInit, **opt_settings)
+        # else:
         evo = optimizer(seed=random_seed, **opt_settings)
-        return evo.run(task=task)
+        r = evo.run(task=task)
+        if isinstance(r[0], np.ndarray):
+            return benchmark.to_phenotype(r[0]), r[1]
+        else:
+            return benchmark.to_phenotype(r[0].x), r[1]
 
     @staticmethod
     def _reduce(mask, results, runs, cv, benchmark, len_y=10):
@@ -159,9 +169,26 @@ class EvoSampling(BaseSampler):
                 if (best_solution is None) or (best_fitness > result_one[1]):
                     best_solution, best_fitness = result_one[0], result_one[1]
 
-            occurrences[mask[i], i] = benchmark.genotype_to_map(best_solution)
+            occurrences[mask[i], i] = best_solution
             i = i + 1
 
         occurrences = stats.mode(occurrences, axis=1, nan_policy='omit')[0].flatten()
 
         return occurrences.astype(np.int8)
+
+    @staticmethod
+    def heuristicInit(task, NP, rnd, **kwargs):
+        target_stats = Counter(task.benchmark.y_train)
+        class_perc = 1 - np.array(list(target_stats.values())) / sum(target_stats.values())
+        instance_perc = class_perc.take(task.benchmark.y_train)
+
+        pop = np.random.normal(0, 0.25, (NP, task.D))
+        pop = pop + instance_perc
+        out_of_range = (pop < 0) | (pop > 1)
+        while np.any(out_of_range):
+            pop[out_of_range] = np.random.normal(0, 0.25, len(pop[out_of_range])) + np.tile(instance_perc, (NP, 1))[
+                out_of_range]
+            out_of_range = (pop < 0) | (pop > 1)
+
+        pop = objects2array([Individual(task=task, rnd=rnd, e=True, x=pop[i]) for i in range(NP)])
+        return pop, np.asarray([x.f for x in pop])
