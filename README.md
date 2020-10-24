@@ -324,6 +324,9 @@ For more examples please look at **Examples** folder.
 
 EvoPreprocess was programmed and is maintained by Saso Karakatic from University of Maribor.
 
+# Citation details
+
+Karakatič, S. (2020). EvoPreprocess—Data Preprocessing Framework with Nature-Inspired Optimization Algorithms. Mathematics, 8(6), 900.
 
 ## License
 
