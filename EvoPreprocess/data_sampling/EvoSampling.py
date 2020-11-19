@@ -17,7 +17,6 @@ from NiaPy.algorithms.basic.ga import GeneticAlgorithm
 from NiaPy.task import StoppingTask, OptimizationType
 from NiaPy.util import objects2array
 from imblearn.base import BaseSampler
-from scipy.stats import stats
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
@@ -172,7 +171,8 @@ class EvoSampling(BaseSampler):
             occurrences[mask[i], i] = best_solution
             i = i + 1
 
-        occurrences = stats.mode(occurrences, axis=1, nan_policy='omit')[0].flatten()
+        # occurrences = stats.mode(occurrences, axis=1, nan_policy='omit')[0].flatten()
+        occurrences = np.ceil(np.nanmean(occurrences, axis=1))
 
         return occurrences.astype(np.int8)
 

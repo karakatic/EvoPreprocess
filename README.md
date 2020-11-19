@@ -15,6 +15,7 @@ EvoSampling requires:
 
 - numpy(>=1.8.2)
 - scipy(>=0.17)
+- pandas
 - scikit-learn(>=0.19.0)
 - imbalanced-learn(>=0.3.1)
 - NiaPy(>=2.0.0rc5)
@@ -320,13 +321,32 @@ print(accuracy_score(y_test, pipeline.predict(X_test)))
 
 For more examples please look at **Examples** folder.
 
-# Authors
+# Author
 
 EvoPreprocess was programmed and is maintained by Saso Karakatic from University of Maribor.
 
-# Citation details
+# Citing
 
-Karakatič, S. (2020). EvoPreprocess—Data Preprocessing Framework with Nature-Inspired Optimization Algorithms. Mathematics, 8(6), 900.
+## Plain format
+```
+Karakatic, S., (2020).
+EvoPreprocess - Data Preprocessing Framework with Nature-Inspired Optimization Algorithms.
+Mathematics, 8(6), p.900. <https://doi.org/10.3390/math8060900>
+```
+
+## Bibtex format
+```
+@article{karakativc2020evopreprocess,
+  title={EvoPreprocess—Data Preprocessing Framework with Nature-Inspired Optimization Algorithms},
+  author={Karakati{\v{c}}, Sa{\v{s}}o},
+  journal={Mathematics},
+  volume={8},
+  number={6},
+  pages={900},
+  year={2020},
+  publisher={Multidisciplinary Digital Publishing Institute}
+}
+```
 
 ## License
 

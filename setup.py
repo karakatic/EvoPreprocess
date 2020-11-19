@@ -50,6 +50,7 @@ setuptools.setup(
     ],
     install_requires=[
         'numpy>=1.8.2',
+        'pandas',
         'scipy>=0.17',
         'scikit-learn>=0.19.0'
         'imbalanced-learn>=0.3.1'
