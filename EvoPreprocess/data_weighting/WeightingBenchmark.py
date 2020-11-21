@@ -7,11 +7,11 @@ inspired algorithms from NiaPy to actual weights.
 # License: GNU General Public License v3.0
 import random
 
-import pandas as pd
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.naive_bayes import GaussianNB
+from sklearn.utils import check_X_y
 
 
 class WeightingBenchmark(Benchmark):
@@ -48,10 +48,7 @@ class WeightingBenchmark(Benchmark):
         self.Upper = 2  # Max weight of the instance, should be tested
         super().__init__(self.Lower, self.Upper)
 
-        if isinstance(X, pd.DataFrame):
-            X = X.values
-        if isinstance(y, pd.Series):
-            y = y.values
+        X, y = check_X_y(X, y, force_all_finite=False)
 
         self.X_train, self.X_valid = X[train_indices], X[valid_indices]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
@@ -65,10 +62,17 @@ class WeightingBenchmark(Benchmark):
 
     def function(self):
         def evaluate(D, sol):
-            cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=sol)
+            weights = WeightingBenchmark.to_phenotype(sol, self.Upper)
+            cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=weights)
             y_predicted = cls.predict(self.X_valid)
             acc = self.metric(self.y_valid, y_predicted)
             acc = (1 - acc) if self.evaluator is ClassifierMixin else acc
             return acc
 
         return evaluate
+
+    @staticmethod
+    def to_phenotype(sol, Upper):
+        max_value = sol[-1] / Upper
+        weights = sol[:-1]
+        return weights * max_value

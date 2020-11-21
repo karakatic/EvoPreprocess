@@ -10,12 +10,12 @@ import math
 import random
 
 import numpy as np
-import pandas as pd
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import f1_score
 from sklearn.metrics import mean_squared_error
 from sklearn.naive_bayes import GaussianNB
+from sklearn.utils import check_X_y
 
 
 class FeatureSelectionBenchmark(Benchmark):
@@ -58,10 +58,7 @@ class FeatureSelectionBenchmark(Benchmark):
         super().__init__(self.Lower, self.Upper)
 
         self.split = split
-        if isinstance(X, pd.DataFrame):
-            X = X.values
-        if isinstance(y, pd.Series):
-            y = y.values
+        X, y = check_X_y(X, y, force_all_finite=False)
 
         self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]

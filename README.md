@@ -13,12 +13,11 @@ These instructions will get you a copy of the project up and running on your loc
 ### Dependencies
 EvoSampling requires:
 
-- numpy(>=1.8.2)
-- scipy(>=0.17)
-- pandas
-- scikit-learn(>=0.19.0)
-- imbalanced-learn(>=0.3.1)
-- NiaPy(>=2.0.0rc5)
+- numpy
+- scipy
+- scikit-learn
+- imbalanced-learn
+- NiaPy(>=2.0.0rc11)
 
 ### Installation
 Install EvoPreprocess with pip:

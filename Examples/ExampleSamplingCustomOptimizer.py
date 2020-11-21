@@ -13,9 +13,14 @@ class RandomSearch(Algorithm):
     Name = ['RandomSearch', 'RS']
 
     def runIteration(self, task, pop, fpop, xb, fxb, **dparams):
-        pop = task.Lower + self.Rand.rand(self.NP, task.D) * task.bRange
-        fpop = apply_along_axis(task.eval, 1, pop)
-        return pop, fpop, {}
+        try:
+            pop = task.Lower + self.Rand.rand(self.NP, task.D) * task.bRange
+            fpop = apply_along_axis(task.eval, 1, pop)
+            xb, fxb = self.getBest(pop, fpop, xb, fxb)
+            return pop, fpop, xb, fxb, {}
+        except Exception as x:
+            print(x)
+            return None, None, None
 
 
 class CustomSamplingBenchmark(SamplingBenchmark):
@@ -24,8 +29,7 @@ class CustomSamplingBenchmark(SamplingBenchmark):
 
     def function(self):
         def evaluate(D, sol):
-            phenotype = SamplingBenchmark.map_to_phenotype(
-                CustomSamplingBenchmark.to_phenotype(sol))
+            phenotype = SamplingBenchmark.map_to_phenotype(CustomSamplingBenchmark.to_phenotype(sol))
             X_sampled = safe_indexing(self.X_train, phenotype)
             y_sampled = safe_indexing(self.y_train, phenotype)
 

@@ -10,12 +10,11 @@ import math
 import random
 
 import numpy as np
-import pandas as pd
 from NiaPy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import mean_squared_error, f1_score
 from sklearn.naive_bayes import GaussianNB
-from sklearn.utils import safe_indexing
+from sklearn.utils import safe_indexing, check_X_y
 
 
 class SamplingBenchmark(Benchmark):
@@ -56,10 +55,7 @@ class SamplingBenchmark(Benchmark):
         self.Upper = 1
         super().__init__(self.Lower, self.Upper)
 
-        if isinstance(X, pd.DataFrame):
-            X = X.values
-        if isinstance(y, pd.Series):
-            y = y.values
+        X, y = check_X_y(X, y, force_all_finite=False)
 
         self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
@@ -97,7 +93,10 @@ class SamplingBenchmark(Benchmark):
         setting = np.cumsum(genotype[-5:])
         appearances = genotype[:-5]
 
-        return np.digitize(appearances, setting / setting[-1])
+        if setting[-1] == 0:
+            return np.digitize(appearances, setting)
+        else:
+            return np.digitize(appearances, setting / setting[-1])
 
     @staticmethod
     def genotype_to_map(genotype):
