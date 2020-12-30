@@ -51,8 +51,8 @@ setuptools.setup(
     install_requires=[
         'numpy',
         'scipy',
-        'scikit-learn'
-        'imbalanced-learn'
+        'scikit-learn',
+        'imbalanced-learn',
         'NiaPy>=2.0.0rc11'
     ],
     keywords=[
