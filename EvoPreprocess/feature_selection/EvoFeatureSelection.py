@@ -163,4 +163,7 @@ class EvoFeatureSelection(_BaseFilter):
 
         features = stats.mode(features, axis=1, nan_policy='omit')[0].flatten()
 
+        if np.sum(features) == 0:
+            features[0] = 1
+
         return features

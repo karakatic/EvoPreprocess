@@ -98,9 +98,9 @@ class SamplingBenchmark(Benchmark):
         else:
             return np.digitize(appearances, setting / setting[-1])
 
-    @staticmethod
-    def genotype_to_map(genotype):
-        return np.digitize(genotype, SamplingBenchmark.mapping)
+    # @staticmethod
+    # def genotype_to_map(genotype):
+    #     return np.digitize(genotype, SamplingBenchmark.mapping)
 
     @staticmethod
     def map_to_phenotype(mapping):
