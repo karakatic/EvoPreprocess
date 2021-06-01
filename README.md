@@ -25,6 +25,12 @@ Install EvoPreprocess with pip:
 ```sh
 $ pip install evopreprocess
 ```
+To install EvoPreprocess on Fedora:
+
+```sh
+$ dnf install python-EvoPreprocess
+```
+
 Or directly from the source code:
 
 ```sh
