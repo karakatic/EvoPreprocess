@@ -12,18 +12,18 @@ from collections import Counter
 from multiprocessing import Pool
 
 import numpy as np
-from NiaPy.algorithms import Individual
-from NiaPy.algorithms.basic.ga import GeneticAlgorithm
-from NiaPy.task import StoppingTask, OptimizationType
-from NiaPy.util import objects2array
 from imblearn.base import BaseSampler
+from niapy.algorithms import Individual
+from niapy.algorithms.basic.ga import GeneticAlgorithm
+from niapy.task import StoppingTask, OptimizationType
+from niapy.util import objects_to_array
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
-from sklearn.utils import check_random_state, safe_indexing
+from sklearn.utils import check_random_state, _safe_indexing
 
-from EvoPreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
-from EvoPreprocess.utils import EvoSettings as es
+from evopreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
+from evopreprocess.utils import EvoSettings as es
 
 logging.basicConfig()
 logger = logging.getLogger('examples')
@@ -129,8 +129,8 @@ class EvoSampling(BaseSampler):
             results = pool.starmap(EvoSampling._run, evos)
         occurrences = EvoSampling._reduce(mask, results, self.n_runs, self.n_folds, self.benchmark, len(y))
         phenotype = self.benchmark.map_to_phenotype(occurrences)
-        return (safe_indexing(X, phenotype),
-                safe_indexing(y, phenotype))
+        return (_safe_indexing(X, phenotype),
+                _safe_indexing(y, phenotype))
 
     @staticmethod
     def _run(X, y, train_index, val_index, random_seed, optimizer, evaluator, benchmark, optimizer_settings):
@@ -140,9 +140,9 @@ class EvoSampling(BaseSampler):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=len(train_index) + 5,
-                            nFES=opt_settings.pop('nFES', 1000),
-                            optType=OptimizationType.MINIMIZATION,
+        task = StoppingTask(dimension=len(train_index) + 5,
+                            max_evals=opt_settings.pop('max_evals', 1000),
+                            optimization_type=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
         # if evaluator is ClassifierMixin:
@@ -190,5 +190,5 @@ class EvoSampling(BaseSampler):
                 out_of_range]
             out_of_range = (pop < 0) | (pop > 1)
 
-        pop = objects2array([Individual(task=task, rnd=rnd, e=True, x=pop[i]) for i in range(NP)])
+        pop = objects_to_array([Individual(task=task, rnd=rnd, e=True, x=pop[i]) for i in range(NP)])
         return pop, np.asarray([x.f for x in pop])

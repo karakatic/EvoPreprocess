@@ -12,18 +12,18 @@ import time
 from multiprocessing import Pool
 
 import numpy as np
-from NiaPy.algorithms.basic.ga import GeneticAlgorithm
-from NiaPy.task import StoppingTask, OptimizationType
+from niapy.algorithms.basic.ga import GeneticAlgorithm
+from niapy.task import StoppingTask, OptimizationType
 from scipy import stats
 from sklearn.base import ClassifierMixin
-from sklearn.feature_selection.univariate_selection import _BaseFilter
+from sklearn.feature_selection._univariate_selection import _BaseFilter
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-import EvoPreprocess.utils.EvoSettings as es
-from EvoPreprocess.feature_selection.FeatureSelectionBenchmark import FeatureSelectionBenchmark
+import evopreprocess.utils.EvoSettings as es
+from evopreprocess.feature_selection.FeatureSelectionBenchmark import FeatureSelectionBenchmark
 
 logging.basicConfig()
 logger = logging.getLogger('examples')
@@ -73,6 +73,7 @@ class EvoFeatureSelection(_BaseFilter):
                  benchmark=FeatureSelectionBenchmark,
                  n_jobs=None,
                  optimizer_settings={}):
+        # self.score_func = self.select
         super(EvoFeatureSelection, self).__init__(self.select)
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
@@ -133,9 +134,9 @@ class EvoFeatureSelection(_BaseFilter):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=X.shape[1] + 1,
-                            nFES=opt_settings.pop('nFES', 1000),
-                            optType=OptimizationType.MINIMIZATION,
+        task = StoppingTask(dimension=X.shape[1] + 1,
+                            max_evals=opt_settings.pop('max_evals', 1000),
+                            optimization_type=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
         evo = optimizer(seed=random_seed, **opt_settings)

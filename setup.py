@@ -3,7 +3,7 @@ import os
 
 import setuptools
 
-PACKAGE_NAME = 'EvoPreprocess'
+PACKAGE_NAME = 'evopreprocess'
 
 
 def read_package_variable(key, filename='__init__.py'):
@@ -53,7 +53,7 @@ setuptools.setup(
         'scipy',
         'scikit-learn',
         'imbalanced-learn',
-        'NiaPy>=2.0.0rc11'
+        'NiaPy==2.0.0rc16'
     ],
     keywords=[
         'Evolutionary Algorithms',

@@ -1,5 +1,5 @@
 """
-The :mod:`EvoPreprocess.utils` provides various helper classes and functions.
+The :mod:`evopreprocess.utils` provides various helper classes and functions.
 """
 
 from .EvoSettings import *

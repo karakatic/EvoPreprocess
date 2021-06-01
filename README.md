@@ -17,19 +17,19 @@ EvoSampling requires:
 - scipy
 - scikit-learn
 - imbalanced-learn
-- NiaPy(>=2.0.0rc11)
+- NiaPy(==2.0.0rc16)
 
 ### Installation
 Install EvoPreprocess with pip:
 
 ```sh
-$ pip install EvoPreprocess
+$ pip install evopreprocess
 ```
 Or directly from the source code:
 
 ```sh
 $ git clone https://github.com/karakatic/EvoPreprocess.git
-$ cd EvoPreprocess
+$ cd evopreprocess
 $ python setup.py install
 ```
 
@@ -39,8 +39,8 @@ After installation, the package can be imported:
 
 ```sh
 $ python
->>> import EvoPreprocess
->>> EvoPreprocess.__version__
+>>> import evopreprocess
+>>> evopreprocess.__version__
 ```
 
 ## Data sampling
@@ -49,7 +49,7 @@ $ python
 
 ```python
 from sklearn.datasets import load_breast_cancer
-from EvoPreprocess.data_sampling import EvoSampling
+from evopreprocess.data_sampling import EvoSampling
 
 # Load classification data
 dataset = load_breast_cancer()
@@ -67,10 +67,10 @@ print(X_resampled.shape, len(y_resampled))
 ### Data sampling for regression with custom nature-inspired algorithm and other custom settings
 
 ```python
-import NiaPy.algorithms.basic as nia
+import niapy.algorithms.basic as nia
 from sklearn.datasets import load_boston
 from sklearn.tree import DecisionTreeRegressor
-from EvoPreprocess.data_sampling import EvoSampling
+from evopreprocess.data_sampling import EvoSampling
 
 # Load regression data
 dataset = load_boston()
@@ -80,11 +80,11 @@ print(dataset.data.shape, len(dataset.target))
 
 # Sample instances of dataset with custom settings and regression with EvoSampling
 X_resampled, y_resampled = EvoSampling(
-	evaluator=DecisionTreeRegressor(),
-	evo_algorithm=nia.EvolutionStrategyMpL,
-	n_folds=5,
-	n_runs=5,
-	n_jobs=4
+    evaluator=DecisionTreeRegressor(),
+    optimizer=nia.EvolutionStrategyMpL,
+    n_folds=5,
+    n_runs=5,
+    n_jobs=4
 ).fit_resample(dataset.data, dataset.target)
 
 # Print the size of dataset after sampling
@@ -98,7 +98,7 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from EvoPreprocess.data_sampling import EvoSampling
+from evopreprocess.data_sampling import EvoSampling
 
 # Set the random seed for the reproducibility
 random_seed = 1111
@@ -135,13 +135,13 @@ print(X_resampled.shape, accuracy_score(y_test, cls.predict(X_test)), sep=': ')
 
 ```python
 from sklearn.datasets import load_breast_cancer
-from EvoPreprocess.data_weighting import EvoWeighting
+from evopreprocess.data_weighting import EvoWeighting
 
 # Load classification data
 dataset = load_breast_cancer()
 
 # Get weights for the instances
-instance_weights = EvoWeighting().reweight(dataset.data, dataset.target)
+instance_weights = EvoWeighting(random_seed=123).reweight(dataset.data, dataset.target)
 
 # Print the weights for instances
 print(instance_weights)
@@ -154,7 +154,7 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from EvoPreprocess.data_weighting import EvoWeighting
+from evopreprocess.data_weighting import EvoWeighting
 
 # Set the random seed for the reproducibility
 random_seed = 1234
@@ -190,7 +190,7 @@ print(X_train.shape, accuracy_score(y_test, cls.predict(X_test)), sep=': ')
 
 ```python
 from sklearn.datasets import load_breast_cancer
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 # Load classification data
 dataset = load_breast_cancer()
@@ -212,8 +212,8 @@ print(X_new.shape)
 ```python
 from sklearn.datasets import load_boston
 from sklearn.tree import DecisionTreeRegressor
-import NiaPy.algorithms.basic as nia
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+import niapy.algorithms.basic as nia
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 # Load regression data
 dataset = load_boston()
@@ -224,7 +224,7 @@ print(dataset.data.shape)
 # Run feature selection with custom settings and regression with EvoFeatureSelection
 X_new = EvoFeatureSelection(
     evaluator=DecisionTreeRegressor(max_depth=2),
-    evo_algorithm=nia.DifferentialEvolution,
+    optimizer=nia.DifferentialEvolution,
     random_seed=1,
     n_runs=5,
     n_folds=5,
@@ -242,10 +242,10 @@ from sklearn.datasets import load_boston
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 # Set the random seed for the reproducibility
-random_seed = 1000
+random_seed = 654
 
 # Load regression data
 dataset = load_boston()
@@ -284,8 +284,8 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from EvoPreprocess.data_sampling import EvoSampling
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+from evopreprocess.data_sampling import EvoSampling
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 # Set the random seed for the reproducibility
 random_seed = 1111

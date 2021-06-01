@@ -1,5 +1,5 @@
 """
-The :mod:`EvoPreprocess.feature_selection` provides a way to select features with evolutionary and nature inspired
+The :mod:`evopreprocess.feature_selection` provides a way to select features with evolutionary and nature inspired
 algorithms.
 """
 

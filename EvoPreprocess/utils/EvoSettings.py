@@ -5,21 +5,20 @@ Helper class for default setting of some evolutionary and nature inspired NiaPy 
 # Authors: Sašo Karakatič <karakatic@gmail.com>
 # License: GNU General Public License v3.0
 
+import niapy.algorithms.basic as nia
 
-import NiaPy.algorithms.basic as nia
-
-NP = 10
-all_kwargs = {'nFES': 1000}
-ga_kwargs = {'NP': NP}
-bat_kwargs = {'NP': NP}
-pso_kwargs = {'NP': NP}
-es_kwargs = {}
-abc_kwargs = {'NP': NP}
-de_kwargs = {'NP': NP}
-fa_kwargs = {'NP': NP}
-gw_kwargs = {'NP': NP}
-hs_kwargs = {'HMS': NP}
-fw_kwargs = {'n': NP}
+population_size = 10
+all_kwargs = {'max_evals': 1000}
+ga_kwargs = {'population_size': population_size}
+bat_kwargs = {'population_size': population_size}
+pso_kwargs = {'population_size': population_size}
+es_kwargs = {'population_size': population_size}
+abc_kwargs = {'population_size': population_size}
+de_kwargs = {'population_size': population_size}
+fa_kwargs = {'population_size': population_size}
+gw_kwargs = {'population_size': population_size}
+hs_kwargs = {'population_size': population_size}
+fw_kwargs = {'population_size': population_size}
 
 kwargs = {nia.GeneticAlgorithm: ga_kwargs,
           nia.BatAlgorithm: bat_kwargs,

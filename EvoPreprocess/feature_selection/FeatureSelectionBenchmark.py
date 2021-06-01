@@ -10,7 +10,7 @@ import math
 import random
 
 import numpy as np
-from NiaPy.benchmarks import Benchmark
+from niapy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import f1_score
 from sklearn.metrics import mean_squared_error

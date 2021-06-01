@@ -1,23 +1,23 @@
 import numpy as np
-from NiaPy.algorithms import Algorithm
+from niapy.algorithms import Algorithm
 from numpy import apply_along_axis, math
 from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import accuracy_score
-from sklearn.utils import safe_indexing
+from sklearn.utils import _safe_indexing
 
-from EvoPreprocess.data_sampling import EvoSampling
-from EvoPreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
+from evopreprocess.data_sampling import EvoSampling
+from evopreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
 
 
 class RandomSearch(Algorithm):
     Name = ['RandomSearch', 'RS']
 
-    def runIteration(self, task, pop, fpop, xb, fxb, **dparams):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
         try:
-            pop = task.Lower + self.Rand.rand(self.NP, task.D) * task.bRange
-            fpop = apply_along_axis(task.eval, 1, pop)
-            xb, fxb = self.getBest(pop, fpop, xb, fxb)
-            return pop, fpop, xb, fxb, {}
+            population = task.Lower + self.rng.rand(self.population_size, task.D) * task.bRange
+            population_fitness = apply_along_axis(task.eval, 1, population)
+            best_x, best_fitness = self.get_best(population, population_fitness, best_x, best_fitness)
+            return population, population_fitness, best_x, best_fitness, {}
         except Exception as x:
             print(x)
             return None, None, None
@@ -30,8 +30,8 @@ class CustomSamplingBenchmark(SamplingBenchmark):
     def function(self):
         def evaluate(D, sol):
             phenotype = SamplingBenchmark.map_to_phenotype(CustomSamplingBenchmark.to_phenotype(sol))
-            X_sampled = safe_indexing(self.X_train, phenotype)
-            y_sampled = safe_indexing(self.y_train, phenotype)
+            X_sampled = _safe_indexing(self.X_train, phenotype)
+            y_sampled = _safe_indexing(self.y_train, phenotype)
 
             if X_sampled.shape[0] > 0:
                 cls = self.evaluator.fit(X_sampled, y_sampled)

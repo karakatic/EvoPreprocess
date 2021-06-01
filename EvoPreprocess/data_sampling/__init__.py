@@ -1,5 +1,5 @@
 """
-The :mod:`EvoPreprocess.data_sampling` provides a way to sample datasets with evolutionary and nature inspired
+The :mod:`evopreprocess.data_sampling` provides a way to sample datasets with evolutionary and nature inspired
 algorithms.
 """
 

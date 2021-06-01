@@ -3,7 +3,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Set the random seed for the reproducibility

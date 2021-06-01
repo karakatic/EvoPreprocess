@@ -1,5 +1,5 @@
 """
-The :mod:`EvoPreprocess.data_weighting` provides a way to weight instances in datasets with evolutionary and
+The :mod:`evopreprocess.data_weighting` provides a way to weight instances in datasets with evolutionary and
 nature inspired algorithms.
 """
 

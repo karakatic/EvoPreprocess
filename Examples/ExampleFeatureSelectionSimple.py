@@ -1,5 +1,6 @@
 from sklearn.datasets import load_breast_cancer
-from EvoPreprocess.feature_selection import EvoFeatureSelection
+
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Load classification data

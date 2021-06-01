@@ -7,7 +7,7 @@ inspired algorithms from NiaPy to actual weights.
 # License: GNU General Public License v3.0
 import random
 
-from NiaPy.benchmarks import Benchmark
+from niapy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.naive_bayes import GaussianNB

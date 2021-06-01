@@ -11,15 +11,15 @@ import time
 from multiprocessing.pool import Pool
 
 import numpy as np
-from NiaPy.algorithms.basic.ga import GeneticAlgorithm
-from NiaPy.task import OptimizationType, StoppingTask
+from niapy.algorithms.basic.ga import GeneticAlgorithm
+from niapy.task import OptimizationType, StoppingTask
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_random_state
 
-import EvoPreprocess.utils.EvoSettings as es
-from EvoPreprocess.data_weighting.WeightingBenchmark import WeightingBenchmark
+import evopreprocess.utils.EvoSettings as es
+from evopreprocess.data_weighting.WeightingBenchmark import WeightingBenchmark
 
 logging.basicConfig()
 logger = logging.getLogger('examples')
@@ -129,9 +129,9 @@ class EvoWeighting(object):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(D=len(train_index) + 1,
-                            nFES=opt_settings.pop('nFES', 1000),
-                            optType=OptimizationType.MINIMIZATION,
+        task = StoppingTask(dimension=len(train_index) + 1,
+                            max_evals=opt_settings.pop('max_evals', 1000),
+                            optimization_type=OptimizationType.MINIMIZATION,
                             benchmark=benchm)
 
         evo = optimizer(seed=random_seed, **opt_settings)

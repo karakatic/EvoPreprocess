@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from EvoPreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
+from evopreprocess.data_sampling.SamplingBenchmark import SamplingBenchmark
 
 
 class MyTestCase(unittest.TestCase):

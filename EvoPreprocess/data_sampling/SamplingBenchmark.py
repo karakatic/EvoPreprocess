@@ -10,11 +10,11 @@ import math
 import random
 
 import numpy as np
-from NiaPy.benchmarks import Benchmark
+from niapy.benchmarks import Benchmark
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import mean_squared_error, f1_score
 from sklearn.naive_bayes import GaussianNB
-from sklearn.utils import safe_indexing, check_X_y
+from sklearn.utils import _safe_indexing, check_X_y
 
 
 class SamplingBenchmark(Benchmark):
@@ -70,8 +70,8 @@ class SamplingBenchmark(Benchmark):
     def function(self):
         def evaluate(D, sol):
             phenotype = SamplingBenchmark.map_to_phenotype(SamplingBenchmark.to_phenotype(sol))
-            X_sampled = safe_indexing(self.X_train, phenotype)
-            y_sampled = safe_indexing(self.y_train, phenotype)
+            X_sampled = _safe_indexing(self.X_train, phenotype)
+            y_sampled = _safe_indexing(self.y_train, phenotype)
 
             if X_sampled.shape[0] > 0:  # Check if no instances were selected
                 cls = self.evaluator.fit(X_sampled, y_sampled)
