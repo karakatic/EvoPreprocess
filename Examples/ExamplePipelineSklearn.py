@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 
-from evopreprocess.feature_selection import EvoFeatureSelection
+from evopreprocess1.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Set the random seed for the reproducibility
