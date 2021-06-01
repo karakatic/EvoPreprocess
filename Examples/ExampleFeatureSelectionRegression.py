@@ -2,7 +2,7 @@ import niapy.algorithms.basic as nia
 from sklearn.datasets import load_boston
 from sklearn.tree import DecisionTreeRegressor
 
-from evopreprocess1.feature_selection import EvoFeatureSelection
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Load regression data

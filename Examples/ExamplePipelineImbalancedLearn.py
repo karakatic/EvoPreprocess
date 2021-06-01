@@ -4,8 +4,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-from evopreprocess1.data_sampling import EvoSampling
-from evopreprocess1.feature_selection import EvoFeatureSelection
+from evopreprocess.data_sampling import EvoSampling
+from evopreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Set the random seed for the reproducibility

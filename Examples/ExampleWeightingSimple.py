@@ -1,6 +1,6 @@
 from sklearn.datasets import load_breast_cancer
 
-from evopreprocess1.data_weighting import EvoWeighting
+from evopreprocess.data_weighting import EvoWeighting
 
 if __name__ == '__main__':
     # Load classification data

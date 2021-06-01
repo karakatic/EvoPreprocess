@@ -39,6 +39,7 @@ class WeightingBenchmark(Benchmark):
         The classification or regression object from scikit-learn framework.
         If None, the GausianNB for classification is used.
     """
+
     def __init__(self,
                  X, y,
                  train_indices=None, valid_indices=None,

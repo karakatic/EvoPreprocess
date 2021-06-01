@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-from evopreprocess1.data_weighting import EvoWeighting
+from evopreprocess.data_weighting import EvoWeighting
 
 if __name__ == '__main__':
     # Set the random seed for the reproducibility
