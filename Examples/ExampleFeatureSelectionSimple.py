@@ -10,9 +10,8 @@ if __name__ == '__main__':
     print(dataset.data.shape)
 
     # Run feature selection with EvoFeatureSelection
-    X_new = EvoFeatureSelection().fit_transform(
-                                        dataset.data,
-                                        dataset.target)
+    X_new = EvoFeatureSelection().fit_transform(dataset.data,
+                                                dataset.target)
 
     # Print the size of dataset after feature selection
     print(X_new.shape)

@@ -14,12 +14,11 @@ class RandomSearch(Algorithm):
 
     def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
         try:
-            population = task.Lower + self.rng.rand(self.population_size, task.D) * task.bRange
+            population = task.lower[0] + self.rng.random(size=(self.population_size, task.dimension)) * task.range
             population_fitness = apply_along_axis(task.eval, 1, population)
             best_x, best_fitness = self.get_best(population, population_fitness, best_x, best_fitness)
             return population, population_fitness, best_x, best_fitness, {}
         except Exception as x:
-            print(x)
             return None, None, None
 
 
@@ -27,26 +26,23 @@ class CustomSamplingBenchmark(SamplingBenchmark):
     # _________________0____1_____2______3_______4___
     mapping = np.array([0.5, 0.75, 0.875, 0.9375, 1])
 
-    def function(self):
-        def evaluate(D, sol):
-            phenotype = SamplingBenchmark.map_to_phenotype(CustomSamplingBenchmark.to_phenotype(sol))
-            X_sampled = _safe_indexing(self.X_train, phenotype)
-            y_sampled = _safe_indexing(self.y_train, phenotype)
+    def _evaluate(self, sol):
+        phenotype = SamplingBenchmark.map_to_phenotype(self.to_phenotype(sol))
+        X_sampled = _safe_indexing(self.X_train, phenotype)
+        y_sampled = _safe_indexing(self.y_train, phenotype)
 
-            if X_sampled.shape[0] > 0:
-                cls = self.evaluator.fit(X_sampled, y_sampled)
-                y_predicted = cls.predict(self.X_valid)
-                quality = accuracy_score(self.y_valid, y_predicted)
-                size_percentage = len(y_sampled) / len(sol)
+        if X_sampled.shape[0] > 0:
+            cls = self.evaluator.fit(X_sampled, y_sampled)
+            y_predicted = cls.predict(self.X_valid)
+            quality = accuracy_score(self.y_valid, y_predicted)
+            size_percentage = len(y_sampled) / len(sol)
 
-                return (1 - quality) * size_percentage
-            else:
-                return math.inf
+            return (1 - quality) * size_percentage
+        else:
+            print('aaa')
+            return math.inf
 
-        return evaluate
-
-    @staticmethod
-    def to_phenotype(genotype):
+    def to_phenotype(self, genotype):
         return np.digitize(genotype[:-5], CustomSamplingBenchmark.mapping)
 
 

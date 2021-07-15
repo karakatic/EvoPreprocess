@@ -15,7 +15,7 @@ import numpy as np
 from imblearn.base import BaseSampler
 from niapy.algorithms import Individual
 from niapy.algorithms.basic.ga import GeneticAlgorithm
-from niapy.task import StoppingTask, OptimizationType
+from niapy.task import Task, OptimizationType
 from niapy.util import objects_to_array
 from sklearn.base import ClassifierMixin
 from sklearn.model_selection import StratifiedKFold, KFold
@@ -140,10 +140,9 @@ class EvoSampling(BaseSampler):
                            train_indices=train_index, valid_indices=val_index,
                            random_seed=random_seed,
                            evaluator=evaluator)
-        task = StoppingTask(dimension=len(train_index) + 5,
-                            max_evals=opt_settings.pop('max_evals', 1000),
-                            optimization_type=OptimizationType.MINIMIZATION,
-                            benchmark=benchm)
+        task = Task(max_evals=opt_settings.pop('max_evals', 1000),
+                    optimization_type=OptimizationType.MINIMIZATION,
+                    problem=benchm)
 
         # if evaluator is ClassifierMixin:
         #     evo = optimizer(seed=random_seed, InitPopFunc=EvoSampling.heuristicInit, **opt_settings)
@@ -151,9 +150,9 @@ class EvoSampling(BaseSampler):
         evo = optimizer(seed=random_seed, **opt_settings)
         r = evo.run(task=task)
         if isinstance(r[0], np.ndarray):
-            return benchmark.to_phenotype(r[0]), r[1]
+            return benchm.to_phenotype(r[0]), r[1]
         else:
-            return benchmark.to_phenotype(r[0].x), r[1]
+            return benchm.to_phenotype(r[0].x), r[1]
 
     @staticmethod
     def _reduce(mask, results, runs, cv, benchmark, len_y=10):

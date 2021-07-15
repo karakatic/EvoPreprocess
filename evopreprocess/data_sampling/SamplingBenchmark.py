@@ -10,14 +10,14 @@ import math
 import random
 
 import numpy as np
-from niapy.benchmarks import Benchmark
+from niapy.problems import Problem
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import mean_squared_error, f1_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import _safe_indexing, check_X_y
 
 
-class SamplingBenchmark(Benchmark):
+class SamplingBenchmark(Problem):
     """
     Helper benchmark class for sampling data.
 
@@ -51,14 +51,11 @@ class SamplingBenchmark(Benchmark):
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
-        self.Lower = 0
-        self.Upper = 1
-        super().__init__(self.Lower, self.Upper)
-
         X, y = check_X_y(X, y, force_all_finite=False)
-
         self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
+
+        super().__init__(self.X_train.shape[0] + 5, 0, 1)  # TODO +5 should be tested
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.evaluator.random_state = random_seed
@@ -67,29 +64,25 @@ class SamplingBenchmark(Benchmark):
         self.random_seed = random_seed
         random.seed(random_seed)
 
-    def function(self):
-        def evaluate(D, sol):
-            phenotype = SamplingBenchmark.map_to_phenotype(SamplingBenchmark.to_phenotype(sol))
-            X_sampled = _safe_indexing(self.X_train, phenotype)
-            y_sampled = _safe_indexing(self.y_train, phenotype)
+    def _evaluate(self, sol):
+        phenotype = SamplingBenchmark.map_to_phenotype(self.to_phenotype(sol))
+        X_sampled = _safe_indexing(self.X_train, phenotype)
+        y_sampled = _safe_indexing(self.y_train, phenotype)
 
-            if X_sampled.shape[0] > 0:  # Check if no instances were selected
-                cls = self.evaluator.fit(X_sampled, y_sampled)
-                y_predicted = cls.predict(self.X_valid)
-                acc = self.metric(self.y_valid, y_predicted)
-                # used_percentage = len(y_sampled) / len(sol)
+        if X_sampled.shape[0] > 0:  # Check if no instances were selected
+            cls = self.evaluator.fit(X_sampled, y_sampled)
+            y_predicted = cls.predict(self.X_valid)
+            acc = self.metric(self.y_valid, y_predicted)
+            # used_percentage = len(y_sampled) / len(sol)
 
-                # Check if classifier or regressor
-                acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
-                # return acc + used_percentage
-                return acc
-            else:
-                return math.inf
+            # Check if classifier or regressor
+            acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
+            # return acc + used_percentage
+            return acc
+        else:
+            return math.inf
 
-        return evaluate
-
-    @staticmethod
-    def to_phenotype(genotype):
+    def to_phenotype(self, genotype):
         setting = np.cumsum(genotype[-5:])
         appearances = genotype[:-5]
 
@@ -105,10 +98,3 @@ class SamplingBenchmark(Benchmark):
     @staticmethod
     def map_to_phenotype(mapping):
         return np.repeat(range(len(mapping)), mapping)
-
-
-if __name__ == '__main__':
-    gene = np.array([0.123, 0.57, 0, 0.78, 1, 0.7, 0.4, 0.5])
-    print(gene)
-    phenotype = SamplingBenchmark.to_phenotype(gene)
-    print(phenotype)

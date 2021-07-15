@@ -7,14 +7,14 @@ inspired algorithms from NiaPy to actual weights.
 # License: GNU General Public License v3.0
 import random
 
-from niapy.benchmarks import Benchmark
+from niapy.problems import Problem
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_X_y
 
 
-class WeightingBenchmark(Benchmark):
+class WeightingBenchmark(Problem):
     """
     Helper benchmark class for weighting instances.
 
@@ -45,14 +45,11 @@ class WeightingBenchmark(Benchmark):
                  train_indices=None, valid_indices=None,
                  random_seed=1234,
                  evaluator=None):
-        self.Lower = 0
-        self.Upper = 2  # Max weight of the instance, should be tested
-        super().__init__(self.Lower, self.Upper)
-
         X, y = check_X_y(X, y, force_all_finite=False)
-
         self.X_train, self.X_valid = X[train_indices], X[valid_indices]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
+
+        super().__init__(self.X_train.shape[0] + 1, 0, 2)  # TODO: 2 should be tested
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.evaluator.random_state = random_seed
@@ -61,19 +58,15 @@ class WeightingBenchmark(Benchmark):
         self.random_seed = random_seed
         random.seed(random_seed)
 
-    def function(self):
-        def evaluate(D, sol):
-            weights = WeightingBenchmark.to_phenotype(sol, self.Upper)
-            cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=weights)
-            y_predicted = cls.predict(self.X_valid)
-            acc = self.metric(self.y_valid, y_predicted)
-            acc = (1 - acc) if self.evaluator is ClassifierMixin else acc
-            return acc
+    def _evaluate(self, sol):
+        weights = self.to_phenotype(sol)
+        cls = self.evaluator.fit(self.X_train, self.y_train, sample_weight=weights)
+        y_predicted = cls.predict(self.X_valid)
+        acc = self.metric(self.y_valid, y_predicted)
+        acc = (1 - acc) if self.evaluator is ClassifierMixin else acc
+        return acc
 
-        return evaluate
-
-    @staticmethod
-    def to_phenotype(sol, Upper):
-        max_value = sol[-1] / Upper
+    def to_phenotype(self, sol):
+        max_value = sol[-1] / self.upper[0]
         weights = sol[:-1]
         return weights * max_value

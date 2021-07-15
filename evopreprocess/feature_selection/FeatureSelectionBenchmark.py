@@ -10,7 +10,7 @@ import math
 import random
 
 import numpy as np
-from niapy.benchmarks import Benchmark
+from niapy.problems import Problem
 from sklearn.base import ClassifierMixin
 from sklearn.metrics import f1_score
 from sklearn.metrics import mean_squared_error
@@ -18,7 +18,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.utils import check_X_y
 
 
-class FeatureSelectionBenchmark(Benchmark):
+class FeatureSelectionBenchmark(Problem):
     """
     Helper benchmark class for feature selection.
 
@@ -53,15 +53,13 @@ class FeatureSelectionBenchmark(Benchmark):
                  random_seed=1234,
                  evaluator=None,
                  split=None):
-        self.Lower = 0
-        self.Upper = 1
-        super().__init__(self.Lower, self.Upper)
 
         self.split = split
         X, y = check_X_y(X, y, force_all_finite=False)
-
         self.X_train, self.X_valid = X[train_indices, :], X[valid_indices, :]
         self.y_train, self.y_valid = y[train_indices], y[valid_indices]
+
+        super().__init__(self.X_train.shape[1] + 1, 0, 1)
 
         self.evaluator = GaussianNB() if evaluator is None else evaluator
         self.evaluator.random_state = random_seed
@@ -70,33 +68,29 @@ class FeatureSelectionBenchmark(Benchmark):
         self.random_seed = random_seed
         random.seed(random_seed)
 
-    def function(self):
-        def evaluate(D, sol):
-            phenotype = FeatureSelectionBenchmark.to_phenotype(sol, self.split)
-            X_train_new = self.X_train[:, phenotype]
-            X_valid_new = self.X_valid[:, phenotype]
+    def _evaluate(self, sol):
+        phenotype = self.to_phenotype(sol)
+        X_train_new = self.X_train[:, phenotype]
+        X_valid_new = self.X_valid[:, phenotype]
 
-            if X_train_new.shape[1] > 0:  # Check if no features were selected
-                cls = self.evaluator.fit(X_train_new, self.y_train)
-                y_predicted = cls.predict(X_valid_new)
-                acc = self.metric(self.y_valid, y_predicted)
-                # used_percentage = X_train_new.shape[1] / len(sol)
+        if X_train_new.shape[1] > 0:  # Check if no features were selected
+            cls = self.evaluator.fit(X_train_new, self.y_train)
+            y_predicted = cls.predict(X_valid_new)
+            acc = self.metric(self.y_valid, y_predicted)
+            # used_percentage = X_train_new.shape[1] / len(sol)
 
-                # Check if classifier or regressor
-                acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
-                return acc
-            else:
-                return math.inf
+            # Check if classifier or regressor
+            acc = (1 - acc) if issubclass(type(self.evaluator), ClassifierMixin) else acc
+            return acc
+        else:
+            return math.inf
 
-        return evaluate
-
-    @staticmethod
-    def to_phenotype(genotype, split=None):
-        if split is None:
-            s = genotype[-1] if split is None else split
+    def to_phenotype(self, genotype):
+        if self.split is None:
+            s = genotype[-1]
             features = genotype[:-1]
         else:
-            s = split
+            s = self.split
             features = genotype
         return features >= s
 
@@ -107,10 +101,3 @@ class FeatureSelectionBenchmark(Benchmark):
     @staticmethod
     def map_to_phenotype(mapping):
         return np.where(mapping == 1)[0]
-
-
-if __name__ == '__main__':
-    gene = np.array([0.123, 0.57, 0, 0.78, 1])
-    print(gene)
-    phenotype = FeatureSelectionBenchmark.to_phenotype(gene)
-    print(phenotype)
