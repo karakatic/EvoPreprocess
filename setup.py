@@ -37,6 +37,9 @@ setuptools.setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
@@ -53,7 +56,7 @@ setuptools.setup(
         'scipy',
         'scikit-learn',
         'imbalanced-learn',
-        'NiaPy==2.0.0rc17'
+        'NiaPy==2.0.0rc18'
     ],
     keywords=[
         'Evolutionary Algorithms',
