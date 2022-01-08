@@ -17,7 +17,7 @@ EvoSampling requires:
 - scipy
 - scikit-learn
 - imbalanced-learn
-- NiaPy(==2.0.0rc18)
+- NiaPy(>=2.0.0)
 
 ### Installation
 Install EvoPreprocess with pip:
