@@ -1,12 +1,12 @@
 import niapy.algorithms.basic as nia
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 from sklearn.tree import DecisionTreeRegressor
 
 from evopreprocess.feature_selection import EvoFeatureSelection
 
 if __name__ == '__main__':
     # Load regression data
-    dataset = load_boston()
+    dataset = load_diabetes()
 
     # Print the size of dataset
     print(dataset.data.shape)

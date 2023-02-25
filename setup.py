@@ -56,7 +56,7 @@ setuptools.setup(
         'scipy',
         'scikit-learn',
         'imbalanced-learn',
-        'NiaPy>=2.0.0'
+        'NiaPy>=2.0.4'
     ],
     keywords=[
         'Evolutionary Algorithms',

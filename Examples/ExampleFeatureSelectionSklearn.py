@@ -1,4 +1,4 @@
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
@@ -10,7 +10,7 @@ if __name__ == '__main__':
     random_seed = 654
 
     # Load regression data
-    dataset = load_boston()
+    dataset = load_diabetes()
 
     # Split the dataset to training and testing set
     X_train, X_test, y_train, y_test = train_test_split(dataset.data, dataset.target,
